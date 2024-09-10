@@ -2,7 +2,10 @@
 FROM php:8.3-apache
 
 # Installer les extensions PHP nécessaires pour Drupal
-RUN apt-get update && apt-get install -y \
+RUN apt update && apt upgrade -y \
+    && apt install -y software-properties-common
+
+RUN apt install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
@@ -12,7 +15,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     ca-certificates \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) gd opcache mysqli zip
+    && docker-php-ext-install -j$(nproc) gd opcache zip mysqli pdo pdo_mysql
 
 # Activer le module Apache rewrite (indispensable pour Drupal)
 RUN a2enmod rewrite ssl
