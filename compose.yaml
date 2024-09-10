@@ -6,7 +6,6 @@ services:
       - "443:443"
     volumes:
       - ./app/drupal:/var/www/html # Monter ton répertoire local contenant Drupal
-      - ./ssl:/etc/ssl
       - drupal_files:/var/www/html/web/sites/default/files
       - ./app/site.conf:/etc/apache2/sites-available/site.conf
     depends_on:
