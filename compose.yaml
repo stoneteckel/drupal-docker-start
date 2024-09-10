@@ -1,0 +1,50 @@
+services:
+  drupal:
+    build: .
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./app/drupal:/var/www/html # Monter ton répertoire local contenant Drupal
+      - ./ssl:/etc/ssl
+      - drupal_files:/var/www/html/web/sites/default/files
+      - ./app/site.conf:/etc/apache2/sites-available/site.conf
+    depends_on:
+      - db
+    environment:
+      VIRTUAL_HOST: ${VIRTUAL_HOST}
+      DRUPAL_DB_HOST: db
+      DRUPAL_DB_NAME: ${DRUPAL_DB_NAME}
+      DRUPAL_DB_USER: ${DRUPAL_DB_USER}
+      DRUPAL_DB_PASSWORD_FILE: /run/secrets/db-password
+    secrets:
+      - db-password
+    restart: on-failure
+
+  db:
+    image: mariadb:latest
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db-password
+      MYSQL_DATABASE: ${DRUPAL_DB_NAME}
+      MYSQL_USER: ${DRUPAL_DB_USER}
+      MYSQL_PASSWORD: /run/secrets/db-password
+    volumes:
+      - db-data:/var/lib/mysql
+    ports:
+      - "3306:3306" # Exposer MySQL si nécessaire (par exemple pour phpMyAdmin)
+    secrets:
+      - db-password
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  db-data:
+  drupal_files:
+
+secrets:
+  db-password:
+    file: ./db/db-password.txt
