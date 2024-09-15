@@ -20,20 +20,15 @@ RUN apt install -y \
 # Activer le module Apache rewrite (indispensable pour Drupal)
 RUN a2enmod rewrite ssl
 
-# Variables
-ENV VIRTUAL_HOST=example.com
-
 # Configurer PHP pour une utilisation en développement
 COPY ./app/php.ini /usr/local/etc/php/
 COPY ./ssl/certs/destroyer.crt /etc/ssl/certs/
 COPY ./ssl/private/destroyer.key /etc/ssl/private/
 RUN  chown -R www-data:www-data /etc/ssl/private
 COPY ./app/site.conf /etc/apache2/sites-available/
+COPY ./composer.phar /usr/local/bin/composer
 
 RUN a2ensite site.conf
-
-# Changer les permissions du dossier pour permettre au serveur web de l'écrire
-RUN chown -R www-data:www-data /var/www/html
 
 # Définir le dossier de travail
 WORKDIR /var/www/html
