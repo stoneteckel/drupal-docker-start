@@ -20,11 +20,10 @@ RUN apt install -y \
 # Activer le module Apache rewrite (indispensable pour Drupal)
 RUN a2enmod rewrite ssl
 RUN mkdir -p /var/www/html/web/sites/default/files/translations
-RUN echo "alias ll=ls -la" >> /root/.bashrc
 RUN chown -R www-data:www-data /var/www/html/web/sites/default/files
 
 # Configurer PHP pour une utilisation en développement
-COPY ./app/php.ini /usr/local/etc/php/
+COPY ./app/php.ini.dev /usr/local/etc/php/php.ini
 COPY ./ssl/certs/destroyer.crt /etc/ssl/certs/
 COPY ./ssl/private/destroyer.key /etc/ssl/private/
 RUN  chown -R www-data:www-data /etc/ssl/private
@@ -35,7 +34,6 @@ RUN a2ensite site.conf
 
 # Définir le dossier de travail
 WORKDIR /var/www/html
-
 
 # Utiliser un utilisateur non root pour plus de sécurité
 USER www-data
