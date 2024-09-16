@@ -1,5 +1,5 @@
 # Utiliser l'image PHP avec Apache
-FROM php:8.3-apache
+FROM php:8.1-apache
 
 # Installer les extensions PHP nécessaires pour Drupal
 RUN apt update && apt upgrade -y \
@@ -19,6 +19,9 @@ RUN apt install -y \
 
 # Activer le module Apache rewrite (indispensable pour Drupal)
 RUN a2enmod rewrite ssl
+RUN mkdir -p /var/www/html/web/sites/default/files/translations
+RUN echo "alias ll=ls -la" >> /root/.bashrc
+RUN chown -R www-data:www-data /var/www/html/web/sites/default/files
 
 # Configurer PHP pour une utilisation en développement
 COPY ./app/php.ini /usr/local/etc/php/

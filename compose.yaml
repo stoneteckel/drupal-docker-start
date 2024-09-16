@@ -10,29 +10,39 @@ services:
       - ./app/site.conf:/etc/apache2/sites-available/site.conf
     depends_on:
       - db
+    env_file:
+      - path: ./.env
+        required: true
     environment:
       VIRTUAL_HOST: ${VIRTUAL_HOST}
       DRUPAL_DB_HOST: db
       DRUPAL_DB_NAME: ${DRUPAL_DB_NAME}
       DRUPAL_DB_USER: ${DRUPAL_DB_USER}
-      DRUPAL_DB_PASSWORD_FILE: /run/secrets/db-password
+      DRUPAL_DB_PASSWORD: ${DRUPAL_DB_PASSWORD}
     secrets:
       - db-password
+    networks:
+      - destroyer-network
     restart: on-failure
 
   db:
-    image: mariadb:latest
+    image: mariadb:11.2.5-jammy
+    env_file:
+      - path: .env
+        required: true
     environment:
-      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db-password
-      MYSQL_DATABASE: ${DRUPAL_DB_NAME}
-      MYSQL_USER: ${DRUPAL_DB_USER}
-      MYSQL_PASSWORD: /run/secrets/db-password
+      MARIADB_ROOT_PASSWORD_FILE: /run/secrets/db-password
+      MARIADB_DATABASE: ${DRUPAL_DB_NAME}
+      MARIADB_USER: ${DRUPAL_DB_USER}
+      MARIADB_PASSWORD: ko9cbIX2dY1MCEWMuq9Riz6r4osavOJ
     volumes:
       - db-data:/var/lib/mysql
     ports:
       - "3306:3306" # Exposer MySQL si nécessaire (par exemple pour phpMyAdmin)
     secrets:
       - db-password
+    networks:
+      - destroyer-network
     restart: on-failure
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
@@ -47,3 +57,6 @@ volumes:
 secrets:
   db-password:
     file: ./db/db-password.txt
+
+networks:
+  destroyer-network:
