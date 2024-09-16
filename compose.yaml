@@ -13,12 +13,6 @@ services:
     env_file:
       - path: ./.env
         required: true
-    environment:
-      VIRTUAL_HOST: ${VIRTUAL_HOST}
-      DRUPAL_DB_HOST: db
-      DRUPAL_DB_NAME: ${DRUPAL_DB_NAME}
-      DRUPAL_DB_USER: ${DRUPAL_DB_USER}
-      DRUPAL_DB_PASSWORD: ${DRUPAL_DB_PASSWORD}
     secrets:
       - db-password
     networks:
@@ -28,13 +22,13 @@ services:
   db:
     image: mariadb:11.2.5-jammy
     env_file:
-      - path: .env
+      - path: ./.env
         required: true
     environment:
       MARIADB_ROOT_PASSWORD_FILE: /run/secrets/db-password
       MARIADB_DATABASE: ${DRUPAL_DB_NAME}
       MARIADB_USER: ${DRUPAL_DB_USER}
-      MARIADB_PASSWORD: ko9cbIX2dY1MCEWMuq9Riz6r4osavOJ
+      MARIADB_PASSWORD: /run/secrets/drupal-db-password
     volumes:
       - db-data:/var/lib/mysql
     ports:
@@ -56,7 +50,9 @@ volumes:
 
 secrets:
   db-password:
-    file: ./db/db-password.txt
+    file: ./db/db-password
+  drupal-db-password:
+    file: ./db/drupal-db-password
 
 networks:
   destroyer-network:
